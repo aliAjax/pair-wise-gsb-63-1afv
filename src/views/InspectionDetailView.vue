@@ -23,6 +23,28 @@ watch(record, (value) => {
 
 const items = computed(() => record.value?.items ?? [])
 const transitions: InspectionStatus[] = ['待检验', '需整改', '整改中', '待复测', '已关闭', '停用']
+const deviceLink = computed(() => record.value ? store.validChain.get(record.value.deviceCode) : undefined)
+const recordReleases = computed(() => store.releases.filter((item) => item.inspectionId === record.value?.id))
+
+function reconfirm() {
+  if (!record.value) return
+  const result = store.reconfirmInspection(record.value.id)
+  result.ok ? message.success(result.message) : message.error(result.message)
+}
+
+function release() {
+  if (!record.value) return
+  dialog.warning({
+    title: `确认放行${record.value.deviceName} ${record.value.shift}`,
+    content: '系统会校验结论有效性、部件与当前有效换件链一致性、停用状态和异常项。',
+    positiveText: '确认放行',
+    negativeText: '取消',
+    onPositiveClick: () => {
+      const result = store.releaseShift(record.value!.id)
+      result.ok ? message.success(result.message) : message.error(result.message)
+    }
+  })
+}
 
 function save() {
   if (!record.value) return
@@ -99,6 +121,31 @@ function exportRecord() {
         <div><strong>现场证据</strong><span>{{ record.evidenceCount }} 张照片 · 最近上传 09:31</span></div>
         <div class="evidence-list"><span>锁止间隙近景</span><span>设备铭牌</span><span>制动测试仪表</span><button @click="record.evidenceCount += 1; message.success('已模拟上传现场照片')">上传照片</button></div>
       </div>
+
+      <div class="chain-panel">
+        <div class="chain-panel-head">
+          <h3>部件履历与放行</h3>
+          <NTag :type="record.conclusionStatus === '有效' ? 'success' : record.conclusionStatus === '待核' ? 'warning' : 'error'" :bordered="false">结论{{ record.conclusionStatus }}</NTag>
+        </div>
+        <div class="chain-facts">
+          <div><span>检验绑定部件</span><strong>{{ record.partSerial || '未绑定' }}</strong></div>
+          <div><span>设备当前有效部件</span><strong>{{ deviceLink?.partSerial ?? '无有效履历' }}</strong></div>
+          <div><span>有效履历</span><strong>{{ deviceLink ? `${deviceLink.id} · 盖章 ${deviceLink.stampedAt.replace('T', ' ').slice(0, 16)}` : '—' }}</strong></div>
+        </div>
+        <p v-if="record.conclusionStatus === '失效'" class="chain-warning">部件履历已更新，本检验结论失效，需按新部件重新确认后才可放行。</p>
+        <p v-else-if="record.conclusionStatus === '待核'" class="chain-warning">部件序列号待核，本记录不参与放行。</p>
+        <div class="chain-panel-actions">
+          <NButton v-if="record.conclusionStatus !== '有效'" size="small" @click="reconfirm">按新部件重新确认</NButton>
+          <NButton size="small" type="primary" :disabled="record.conclusionStatus !== '有效'" @click="release">放行本班次</NButton>
+        </div>
+        <div v-if="recordReleases.length" class="release-list">
+          <div v-for="item in recordReleases" :key="item.id" class="release-row">
+            <span>{{ item.id }} · {{ item.shift }}</span>
+            <NTag size="small" :type="item.status === '已放行' ? 'success' : 'warning'" :bordered="false">{{ item.status }}</NTag>
+            <small>{{ item.recheckNote ?? item.basis }}</small>
+          </div>
+        </div>
+      </div>
     </div>
 
     <aside class="detail-side">
@@ -114,7 +161,7 @@ function exportRecord() {
       </div>
       <div class="rule-note">
         <strong>闭环校验</strong>
-        <p>异常项存在时禁止关闭；紧急风险必须先停用设备。所有操作均写入审计。</p>
+        <p>异常项存在时禁止关闭；紧急风险必须先停用设备。部件履历更新后未放行结论失效，放行以当前有效换件链为准。所有操作均写入审计。</p>
       </div>
       <NButton block @click="router.push('/audit')">查看完整审计</NButton>
     </aside>

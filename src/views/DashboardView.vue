@@ -28,6 +28,10 @@ const columns = [
   { title: '设备', key: 'deviceName', width: 130, render: (row: any) => `${row.deviceName} / ${row.deviceCode}` },
   { title: '区域', key: 'area', width: 90 },
   { title: '状态', key: 'status', width: 90, render: (row: any) => h(NTag, { type: row.stopped ? 'error' : row.status === '已关闭' ? 'success' : 'warning', bordered: false }, { default: () => row.status }) },
+  { title: '部件 / 结论', key: 'partSerial', width: 150, render: (row: any) => h('div', { class: 'chain-cell' }, [
+    h('span', null, row.partSerial || '未绑定部件'),
+    h(NTag, { size: 'tiny', bordered: false, type: row.conclusionStatus === '有效' ? 'success' : row.conclusionStatus === '待核' ? 'warning' : 'error' }, { default: () => `结论${row.conclusionStatus}` })
+  ]) },
   { title: '风险', key: 'risk', width: 80 },
   { title: '责任人', key: 'assignedTo', width: 105 },
   { title: '截止', key: 'dueDate', width: 110 },
@@ -54,6 +58,13 @@ function createRecord() {
       <article><span>停用设备</span><strong>{{ store.stats.blocked }}</strong><small>需优先核实隔离状态</small></article>
       <article><span>临近超期</span><strong>{{ store.stats.overdue }}</strong><small>按整改截止日计算</small></article>
       <article><span>已闭环</span><strong>{{ store.stats.closed }}</strong><small>异常项已复核完成</small></article>
+    </div>
+
+    <div class="metric-strip chain-strip" @click="router.push('/chain')">
+      <article><span>有效换件链</span><strong>{{ store.chainStats.devices }}</strong><small>台设备部件履历有效</small></article>
+      <article><span>待核登记</span><strong>{{ store.chainStats.pending }}</strong><small>盖章冲突待核实</small></article>
+      <article><span>失效结论</span><strong>{{ store.chainStats.invalidated }}</strong><small>需按新部件重新确认</small></article>
+      <article><span>待复核放行</span><strong>{{ store.chainStats.recheck }}</strong><small>已开放班次追加复核</small></article>
     </div>
 
     <div class="toolbar">

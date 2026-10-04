@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --port 18463",
     "build": "vue-tsc --noEmit -p tsconfig.app.json && vite build",
-    "preview": "vite preview --port 18463"
+    "preview": "vite preview --port 18463",
+    "test": "esbuild test/chain.test.ts --bundle --platform=node --format=cjs \"--define:import.meta.env={}\" --outfile=node_modules/.cache/chain.test.cjs && node node_modules/.cache/chain.test.cjs"
   },
   "dependencies": {
     "@tanstack/vue-query": "^5.66.8",

@@ -99,3 +99,41 @@ h3 { font-size: 15px; margin: 0 0 10px; }
 .audit-card p { margin: 8px 0; color: #5e6c69; font-size: 12px; }
 .audit-card small { color: #8b9794; font-size: 11px; }
 .empty-state { padding: 80px; text-align: center; color: #71807d; }
+
+/* 换件链 */
+.recovery-banner { display: flex; justify-content: space-between; align-items: center; padding: 9px 28px; background: #fdf3e3; border-bottom: 1px solid #ecd9ae; color: #8a6a1f; font-size: 12px; }
+.recovery-banner button { border: 1px solid #d9bd7f; background: white; color: #8a6a1f; padding: 3px 12px; border-radius: 3px; cursor: pointer; font-size: 12px; }
+.chain-strip { margin-top: 12px; cursor: pointer; }
+.chain-strip article:hover { background: #f6f9f7; }
+.chain-cell { display: grid; gap: 3px; }
+.chain-cell span { font-size: 11px; color: #4c5c59; }
+.chain-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px; margin-top: 14px; }
+.chain-card { background: white; border: 1px solid #dbe2df; border-radius: 5px; padding: 18px 20px; margin-top: 14px; }
+.chain-grid .chain-card { margin-top: 0; }
+.card-tip { margin: 0 0 14px; color: #778684; font-size: 12px; line-height: 1.7; }
+.chain-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+.chain-form label { font-size: 12px; color: #63726f; display: grid; gap: 6px; }
+.chain-form .span-2 { grid-column: span 2; }
+.chain-actions { display: flex; gap: 10px; align-items: center; margin-top: 14px; flex-wrap: wrap; }
+.idem-key { color: #98a5a2; font-size: 11px; }
+.fail-toggle { display: flex; gap: 6px; align-items: center; color: #8a6a1f; font-size: 12px; }
+.pending-list { display: grid; gap: 8px; }
+.pending-list article { border: 1px solid #e3e9e6; border-left: 3px solid #d6a33a; border-radius: 3px; padding: 10px 12px; }
+.pending-list header { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+.pending-list p { margin: 6px 0 8px; color: #778684; font-size: 11px; }
+.gap-top { margin-top: 18px; }
+.chain-panel { background: white; border: 1px solid #dbe2df; border-radius: 5px; padding: 18px 20px; margin-top: 18px; }
+.chain-panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.chain-panel-head h3 { margin: 0; }
+.chain-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.chain-facts div { background: #f4f7f5; padding: 10px 12px; border-radius: 3px; }
+.chain-facts span, .chain-facts strong { display: block; }
+.chain-facts span { color: #7e8c89; font-size: 11px; margin-bottom: 5px; }
+.chain-facts strong { font-size: 13px; color: #15434a; }
+.chain-warning { margin: 12px 0 0; padding: 9px 12px; background: #fdf3e3; border-left: 3px solid #d6a33a; color: #8a6a1f; font-size: 12px; }
+.chain-panel-actions { display: flex; gap: 10px; margin-top: 14px; }
+.release-list { margin-top: 14px; border-top: 1px solid #edf0ef; }
+.release-row { display: grid; grid-template-columns: 200px 70px 1fr; gap: 10px; align-items: center; padding: 9px 0; border-bottom: 1px solid #edf0ef; font-size: 12px; }
+.release-row small { color: #7b8986; }
+.card-chain { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+.card-chain small { color: #8b9794; font-size: 11px; }
