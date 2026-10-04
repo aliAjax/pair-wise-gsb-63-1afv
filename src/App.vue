@@ -10,6 +10,7 @@ let disconnect: () => void = () => undefined
 
 const pageTitle = computed(() => {
   if (route.name === 'defects') return '缺陷处置看板'
+  if (route.name === 'replacements') return '换件链与部件履历'
   if (route.name === 'audit') return '检验审计'
   if (route.name === 'record') return '检验任务详情'
   return '日常检验总览'
@@ -34,7 +35,8 @@ onUnmounted(() => disconnect())
       <nav>
         <RouterLink to="/"><span>01</span>检验总览</RouterLink>
         <RouterLink to="/defects"><span>02</span>缺陷处置</RouterLink>
-        <RouterLink to="/audit"><span>03</span>操作审计</RouterLink>
+        <RouterLink to="/replacements"><span>03</span>换件链</RouterLink>
+        <RouterLink to="/audit"><span>04</span>操作审计</RouterLink>
       </nav>
       <div class="sidebar-status">
         <i />

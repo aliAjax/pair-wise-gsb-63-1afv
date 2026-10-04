@@ -21,9 +21,14 @@ const grouped = computed(() => Object.fromEntries(columns.map((status) => [statu
       <div v-for="column in columns" :key="column" class="kanban-column">
         <header><span>{{ column }}</span><b>{{ grouped[column].length }}</b></header>
         <article v-for="record in grouped[column]" :key="record.id" @click="router.push(`/records/${record.id}`)">
-          <div><NTag :type="record.risk === '紧急' ? 'error' : record.risk === '高' ? 'warning' : 'default'" size="small" :bordered="false">{{ record.risk }}风险</NTag><small>V{{ record.version }}</small></div>
+          <div>
+            <NTag :type="record.risk === '紧急' ? 'error' : record.risk === '高' ? 'warning' : 'default'" size="small" :bordered="false">{{ record.risk }}风险</NTag>
+            <NTag v-if="record.releaseState === '待核' || record.releaseState === '失效'" :type="record.releaseState === '失效' ? 'error' : 'warning'" size="small" :bordered="false">{{ record.releaseState }}</NTag>
+            <small>V{{ record.version }}</small>
+          </div>
           <h3>{{ record.deviceName }}</h3>
           <p>{{ record.deviceCode }} · {{ record.area }}</p>
+          <p>部件 {{ record.partSerial || '序列号待核，不参与放行' }}</p>
           <footer><span>{{ record.assignedTo }}</span><span :class="{ overdue: record.dueDate <= '2026-09-29' }">{{ record.dueDate }} 截止</span></footer>
         </article>
         <div v-if="!grouped[column].length" class="kanban-empty">暂无任务</div>

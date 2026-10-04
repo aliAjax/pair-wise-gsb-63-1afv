@@ -22,7 +22,22 @@ watch(record, (value) => {
 }, { immediate: true })
 
 const items = computed(() => record.value?.items ?? [])
+const recordReleases = computed(() => store.releases.filter((item) => item.recordId === record.value?.id))
 const transitions: InspectionStatus[] = ['待检验', '需整改', '整改中', '待复测', '已关闭', '停用']
+
+function release() {
+  if (!record.value) return
+  dialog.warning({
+    title: record.value.releaseState === '失效' ? '按新部件重新确认放行' : '确认放行',
+    content: '系统将以当前在用部件作为放行依据写入放行记录，并生成操作审计。',
+    positiveText: '确认放行',
+    negativeText: '取消',
+    onPositiveClick: () => {
+      const result = store.releaseInspection(record.value!.id)
+      result.ok ? message.success(result.message) : message.error(result.message)
+    }
+  })
+}
 
 function save() {
   if (!record.value) return
@@ -116,6 +131,28 @@ function exportRecord() {
         <strong>闭环校验</strong>
         <p>异常项存在时禁止关闭；紧急风险必须先停用设备。所有操作均写入审计。</p>
       </div>
+
+      <div class="release-panel">
+        <span class="side-label">放行状态</span>
+        <div class="release-head">
+          <NTag :type="record.releaseState === '已放行' ? 'success' : record.releaseState === '失效' ? 'error' : record.releaseState === '待核' ? 'warning' : 'default'" :bordered="false">{{ record.releaseState ?? '未放行' }}</NTag>
+          <small>部件 {{ record.partSerial || '待核' }}</small>
+        </div>
+        <p v-if="record.releaseBasis" class="release-basis">{{ record.releaseBasis }}</p>
+        <p v-if="record.releaseState === '待核'" class="release-hint">旧数据升级未补全部件序列号，先标待核，不参与放行。</p>
+        <p v-if="record.releaseState === '失效'" class="release-hint">部件履历已更新，原检验结论失效，需按新部件重新确认。</p>
+        <NButton v-if="record.releaseState === '未放行' || record.releaseState === '失效'" block type="primary" @click="release">
+          {{ record.releaseState === '失效' ? '按新部件重新确认放行' : '确认放行' }}
+        </NButton>
+        <div v-if="recordReleases.length" class="release-history">
+          <div v-for="item in recordReleases" :key="item.id" class="release-entry">
+            <header><strong>{{ item.id }}</strong><NTag size="small" :type="item.status === '有效' ? 'success' : item.status === '复核追加' ? 'warning' : 'error'" :bordered="false">{{ item.status }}</NTag></header>
+            <small>{{ item.basis }} · {{ item.releasedAt.replace('T', ' ').slice(0, 16) }}</small>
+            <p v-for="(review, index) in item.reviews" :key="index">{{ review.note }}（{{ review.operator }}）</p>
+          </div>
+        </div>
+      </div>
+
       <NButton block @click="router.push('/audit')">查看完整审计</NButton>
     </aside>
   </section>

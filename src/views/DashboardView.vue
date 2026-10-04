@@ -28,6 +28,7 @@ const columns = [
   { title: '设备', key: 'deviceName', width: 130, render: (row: any) => `${row.deviceName} / ${row.deviceCode}` },
   { title: '区域', key: 'area', width: 90 },
   { title: '状态', key: 'status', width: 90, render: (row: any) => h(NTag, { type: row.stopped ? 'error' : row.status === '已关闭' ? 'success' : 'warning', bordered: false }, { default: () => row.status }) },
+  { title: '放行', key: 'releaseState', width: 86, render: (row: any) => h(NTag, { type: row.releaseState === '已放行' ? 'success' : row.releaseState === '失效' ? 'error' : row.releaseState === '待核' ? 'warning' : 'default', bordered: false }, { default: () => row.releaseState ?? '未放行' }) },
   { title: '风险', key: 'risk', width: 80 },
   { title: '责任人', key: 'assignedTo', width: 105 },
   { title: '截止', key: 'dueDate', width: 110 },
@@ -65,6 +66,28 @@ function createRecord() {
     </div>
 
     <NDataTable :columns="columns" :data="store.filtered" :bordered="false" :row-key="(row: any) => row.id" size="small" />
+
+    <div class="chain-strip">
+      <header>
+        <strong>换件链快照</strong>
+        <span>总览、看板与审计展示同一有效链条，仅含生效换件与在用部件</span>
+      </header>
+      <div class="chain-nodes">
+        <article v-for="node in store.deviceChain" :key="node.deviceCode">
+          <b>{{ node.deviceName }}</b>
+          <small>{{ node.deviceCode }}</small>
+          <span v-if="node.part">在用部件 {{ node.part.serial }}</span>
+          <span v-else class="pending">无在用部件 · 检验待核</span>
+        </article>
+      </div>
+      <div class="chain-flags">
+        <NTag v-if="store.chainStats.pendingReplacements" type="warning" :bordered="false">待核换件 {{ store.chainStats.pendingReplacements }}</NTag>
+        <NTag v-if="store.chainStats.pendingRecords" type="warning" :bordered="false">待核检验 {{ store.chainStats.pendingRecords }}</NTag>
+        <NTag v-if="store.chainStats.invalidated" type="error" :bordered="false">失效结论 {{ store.chainStats.invalidated }}</NTag>
+        <NTag v-if="store.chainStats.reviewing" :bordered="false">追加复核 {{ store.chainStats.reviewing }}</NTag>
+        <span v-if="!store.chainStats.pendingReplacements && !store.chainStats.pendingRecords && !store.chainStats.invalidated && !store.chainStats.reviewing" class="chain-clear">链条完整，无待核与失效项</span>
+      </div>
+    </div>
 
     <NModal v-model:show="showCreate" preset="card" title="新建日常检验任务" style="width: 620px">
       <NForm label-placement="left" label-width="92">

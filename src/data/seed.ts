@@ -1,4 +1,4 @@
-import type { AuditEntry, InspectionItem, InspectionRecord } from '../types'
+import type { AuditEntry, DevicePart, InspectionItem, InspectionRecord, ReleaseRecord, ReplacementRecord } from '../types'
 
 const standardItems = (abnormal = false): InspectionItem[] => [
   { id: 'wear', name: '结构磨损', result: abnormal ? '异常' : '正常', reading: abnormal ? '6.8 mm' : '2.1 mm', limit: '≤ 5.0 mm', note: abnormal ? '主支撑连接处磨损超限' : '' },
@@ -35,3 +35,28 @@ export const seedAudit: AuditEntry[] = seedRecords.flatMap((record) => [
   { id: `${record.id}-A1`, recordId: record.id, action: '创建检验记录', operator: record.inspector, detail: `${record.deviceName}完成班前检验`, createdAt: record.createdAt },
   ...(record.version > 1 ? [{ id: `${record.id}-A${record.version}`, recordId: record.id, action: record.status, operator: '系统流转', detail: `记录更新至版本 V${record.version}`, createdAt: record.updatedAt }] : [])
 ])
+
+// 部件履历：CR-021 暂无登记，用于演示旧数据升级时补不全序列号先标待核
+export const seedParts: DevicePart[] = [
+  { serial: 'BRK-AM014-1107', partName: '制动液压缸', deviceCode: 'AM-014', mountedAt: '2025-11-07T08:00:00', source: '初始登记', status: '已拆下' },
+  { serial: 'BRK-AM014-2301', partName: '制动液压缸', deviceCode: 'AM-014', mountedAt: '2026-08-12T09:10:00', source: '换件登记', status: '在用' },
+  { serial: 'LCK-RC007-1180', partName: '锁止压杠', deviceCode: 'RC-007', mountedAt: '2026-07-03T10:20:00', source: '初始登记', status: '在用' },
+  { serial: 'DRV-WF003-0455', partName: '驱动减速机', deviceCode: 'WF-003', mountedAt: '2026-06-18T14:00:00', source: '初始登记', status: '在用' }
+]
+
+export const seedReplacements: ReplacementRecord[] = [
+  {
+    id: 'REP-260812-01', deviceCode: 'AM-014', deviceName: '高空飞翔', partName: '制动液压缸',
+    oldSerial: 'BRK-AM014-1107', newSerial: 'BRK-AM014-2301',
+    stampedAt: '2026-08-12T09:10:00', submittedAt: '2026-08-12T09:14:00',
+    operator: '周宁', status: '生效', note: '制动响应迟滞，整体更换液压缸'
+  }
+]
+
+export const seedReleases: ReleaseRecord[] = [
+  {
+    id: 'REL-260928-04', recordId: 'INS-240821-04', deviceCode: 'WF-003', shift: '早班',
+    partSerial: 'DRV-WF003-0455', basis: '检验结论 V5 · 全部项目正常',
+    status: '有效', releasedAt: '2026-09-28T16:20:00', reviews: []
+  }
+]

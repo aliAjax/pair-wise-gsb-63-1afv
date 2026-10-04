@@ -11,7 +11,7 @@ const entries = computed(() => store.audit.filter((item) => !keyword.value || `$
 <template>
   <section class="content audit-layout">
     <div class="audit-head">
-      <div><h2>操作审计与版本追溯</h2><p>记录创建、检验修改、状态流转和冲突处理的完整时间线。</p></div>
+      <div><h2>操作审计与版本追溯</h2><p>记录创建、检验修改、状态流转、换件登记与放行复核的完整时间线，与总览、看板共用同一有效换件链。</p></div>
       <NInput v-model:value="keyword" clearable placeholder="按编号、操作人、动作搜索" style="max-width: 330px" />
     </div>
     <div class="timeline">
